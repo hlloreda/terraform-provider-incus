@@ -445,6 +445,16 @@ func TestAccStorageVolume_fileUploadContent(t *testing.T) {
 					resource.TestCheckResourceAttr("incus_storage_volume.volume1", "file.0.create_directories", "false"),
 				),
 			},
+			{
+				Config: testAccStorageVolume_removeFileUploadContent_3(poolName, volumeName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("incus_storage_pool.pool1", "name", poolName),
+					resource.TestCheckResourceAttr("incus_storage_pool.pool1", "driver", "lvm"),
+					resource.TestCheckResourceAttr("incus_storage_volume.volume1", "name", volumeName),
+					resource.TestCheckResourceAttr("incus_storage_volume.volume1", "pool", poolName),
+					resource.TestCheckResourceAttr("incus_storage_volume.volume1", "file.#", "0"),
+				),
+			},
 		},
 	})
 }
@@ -761,6 +771,21 @@ resource "incus_storage_volume" "volume1" {
     mode               = "0777"
     create_directories = false
   }
+}
+	`, poolName, volumeName)
+}
+
+func testAccStorageVolume_removeFileUploadContent_3(poolName, volumeName string) string {
+	return fmt.Sprintf(`
+resource "incus_storage_pool" "pool1" {
+  name   = "%[1]s"
+  driver = "lvm"
+}
+
+resource "incus_storage_volume" "volume1" {
+  name = "%[2]s"
+  pool = incus_storage_pool.pool1.name
+
 }
 	`, poolName, volumeName)
 }
