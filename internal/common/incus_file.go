@@ -64,12 +64,7 @@ func ToFileSetType(ctx context.Context, fileMap map[string]InstanceFileModel) (t
 
 // coreFileDelete deletes a file from a resource (either an instance or a volume).
 func coreFileDelete(targetPath string, deleteOperation func(targetPath string) error) error {
-	targetPath, err := toAbsFilePath(targetPath)
-	if err != nil {
-		return err
-	}
-
-	err = deleteOperation(targetPath)
+	err := deleteOperation(targetPath)
 	if err != nil && !tfierrors.IsNotFoundError(err) {
 		return err
 	}
@@ -250,22 +245,6 @@ func recursiveMkdir(p string, args incus.InstanceFileArgs, createOperation func(
 	}
 
 	return nil
-}
-
-// toAbsFilePath returns absolute path of the given path and ensures that
-// the path is not a directory.
-func toAbsFilePath(path string) (string, error) {
-	targetPath, err := filepath.Abs(path)
-	if err != nil {
-		return "", fmt.Errorf("Failed to determine absoulute target file path: %v", err)
-	}
-
-	isDir := strings.HasSuffix(targetPath, "/")
-	if isDir {
-		return "", fmt.Errorf("Target file %q cannot be a directory: %v", targetPath, err)
-	}
-
-	return targetPath, nil
 }
 
 func hasFileContentChanged(newFile InstanceFileModel, oldFile InstanceFileModel) bool {
