@@ -136,10 +136,7 @@ func coreFileUpload(file InstanceFileModel, createOperation func(string, incus.I
 		return fmt.Errorf("File %q and %q are mutually exclusive.", "content", "source_path")
 	}
 
-	targetPath, err := toAbsFilePath(file.TargetPath.ValueString())
-	if err != nil {
-		return err
-	}
+	targetPath := file.TargetPath.ValueString()
 
 	fileMode := file.Mode.ValueString()
 	if fileMode == "" {
